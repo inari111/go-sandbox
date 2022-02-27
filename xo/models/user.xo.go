@@ -11,10 +11,10 @@ import (
 
 // User represents a row from 'public.users'.
 type User struct {
-	ID        uuid.UUID `json:"id"`         // id
-	Name      string    `json:"name"`       // name
-	CreatedAt time.Time `json:"created_at"` // created_at
-	UpdatedAt time.Time `json:"updated_at"` // updated_at
+	ID        uuid.UUID `json:"id" db:"id"`                 // id
+	Name      string    `json:"name" db:"name"`             // name
+	CreatedAt time.Time `json:"created_at" db:"created_at"` // created_at
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"` // updated_at
 	// xo fields
 	_exists, _deleted bool
 }
