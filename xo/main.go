@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 	"time"
@@ -21,6 +22,7 @@ func main() {
 
 	r.Route("/users", func(r chi.Router) {
 		r.Post("/", createUser)
+		r.Get("/search", searchUser)
 	})
 
 	http.ListenAndServe(":3333", r)
@@ -47,4 +49,29 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+func searchUser(w http.ResponseWriter, r *http.Request) {
+	name := r.URL.Query().Get("name")
+	if name == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	db := models.NewDB()
+	u := models.User{}
+	rows, err := u.GetByName(context.Background(), db, name)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := json.Marshal(rows)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
 }
